@@ -1,0 +1,11 @@
+{
+  "Author": "Caraxi",
+  "Name": "OldMacroRecursion",
+  "Description": "Execute macros from macros. /runmacro ## [shared] [line]",
+  "InternalName": "OldMacroRecursion",
+  "AssemblyVersion": "1.1.2.2",
+  "RepoUrl": "https://github.com/maributt/OldMacroRecursion",
+  "ApplicableVersion": "any",
+  "Tags": ["Macro"],
+  "DalamudApiLevel": 3
+}
