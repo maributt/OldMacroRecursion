@@ -6,6 +6,8 @@
   "AssemblyVersion": "1.1.2.2",
   "RepoUrl": "https://github.com/maributt/OldMacroRecursion",
   "ApplicableVersion": "any",
-  "Tags": ["Macro"],
-  "DalamudApiLevel": 3
+  "Tags": [ "Macro" ],
+  "DalamudApiLevel": 6,
+  "IconUrl": "https://raw.githubusercontent.com/maributt/OldMacroRecursion/icon.png"
+
 }

@@ -1,37 +1,56 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Dalamud.Hooking;
+using Dalamud.Game;
+using Dalamud.Game.Command;
+using Dalamud.Game.Gui;
+using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Hooking;
+using Dalamud.Logging;
 
 namespace OldMacroRecursion {
+
     public class OldMacroRecursion : IDalamudPlugin {
+
+        class Svc
+        {
+            [PluginService] static internal ChatGui Chat { get; private set; }
+            [PluginService] static internal CommandManager Commands { get; private set; }
+            [PluginService] static internal Framework Framework { get; private set; }
+            [PluginService] static internal SigScanner SigScanner { get; private set; }
+        }
+
         public string Name => "OldMacroRecursion";
         private DalamudPluginInterface pluginInterface;
-        
-        private delegate void MacroCallDelegate(IntPtr a, IntPtr b);
 
-        private Hook<MacroCallDelegate> macroCallHook;
-        
-        private IntPtr macroBasePtr = IntPtr.Zero;
-        private IntPtr macroDataPtr = IntPtr.Zero;
-
-        public void Initialize(DalamudPluginInterface pluginInterface) {
+        public OldMacroRecursion(DalamudPluginInterface pluginInterface)
+        {
+            pluginInterface.Create<Svc>();
             this.pluginInterface = pluginInterface;
 
-            try {
-                var macroCallPtr = pluginInterface.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28");
+            try
+            {
+                var macroCallPtr = Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28");
                 macroCallHook = new Hook<MacroCallDelegate>(macroCallPtr, new MacroCallDelegate(MacroCallDetour));
                 macroCallHook?.Enable();
 
-                pluginInterface.CommandManager.AddHandler("/runmacro", new Dalamud.Game.Command.CommandInfo(OnMacroCommandHandler) {
+                Svc.Commands.AddHandler("/runmacro", new Dalamud.Game.Command.CommandInfo(OnMacroCommandHandler)
+                {
                     HelpMessage = "Execute a Macro - /runmacro ## [individual|shared] [line]",
                     ShowInHelp = true
                 });
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 PluginLog.LogError(ex.ToString());
             }
         }
+
+        private delegate void MacroCallDelegate(IntPtr a, IntPtr b);
+        private Hook<MacroCallDelegate> macroCallHook;
+        private IntPtr macroBasePtr = IntPtr.Zero;
+        private IntPtr macroDataPtr = IntPtr.Zero;
 
         private int CurrentMacroLine {
             set {
@@ -48,7 +67,7 @@ namespace OldMacroRecursion {
         }
 
         public void Dispose() {
-            pluginInterface.CommandManager.RemoveHandler("/runmacro");
+            Svc.Commands.RemoveHandler("/runmacro");
             macroCallHook?.Disable();
             macroCallHook?.Dispose();
         }
@@ -87,7 +106,7 @@ namespace OldMacroRecursion {
                     var num = byte.Parse(argSplit[0]);
 
                     if (num > 99) {
-                        pluginInterface.Framework.Gui.Chat.PrintError("Invalid Macro number.\nShould be 0 - 99");
+                        Svc.Chat.PrintError("Invalid Macro number.\nShould be 0 - 99");
                         return;
                     }
 
@@ -124,7 +143,7 @@ namespace OldMacroRecursion {
                         CurrentMacroLine = startingLine - 1;
                     }
                 } else {
-                    pluginInterface.Framework.Gui.Chat.PrintError("OldMacroRecursion is not ready.\nExecute a macro to finish setup.");
+                    Svc.Chat.PrintError("OldMacroRecursion is not ready.\nExecute a macro to finish setup.");
                 }
             } catch (Exception ex) {
                 PluginLog.LogError(ex.ToString());
