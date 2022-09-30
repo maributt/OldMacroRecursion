@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31624.102
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OldMacroRecursion", "OldMacroRecursion.csproj", "{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}"
 EndProject
@@ -13,8 +13,8 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Debug|Any CPU.Build.0 = Debug|x64
 		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Debug|x64.ActiveCfg = Debug|x64
 		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Debug|x64.Build.0 = Debug|x64
 		{E4CBF6D5-A771-42BA-A29A-810D5FC0A590}.Release|Any CPU.ActiveCfg = Release|Any CPU
