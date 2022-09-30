@@ -32,7 +32,7 @@ namespace OldMacroRecursion {
             try
             {
                 var macroCallPtr = Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28");
-                macroCallHook = new Hook<MacroCallDelegate>(macroCallPtr, new MacroCallDelegate(MacroCallDetour));
+                macroCallHook = Hook<MacroCallDelegate>.FromAddress(macroCallPtr, new MacroCallDelegate(MacroCallDetour));
                 macroCallHook?.Enable();
 
                 Svc.Commands.AddHandler("/runmacro", new Dalamud.Game.Command.CommandInfo(OnMacroCommandHandler)
