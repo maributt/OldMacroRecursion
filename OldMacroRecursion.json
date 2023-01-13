@@ -7,6 +7,6 @@
   "RepoUrl": "https://github.com/maributt/OldMacroRecursion",
   "ApplicableVersion": "any",
   "Tags": [ "Macro" ],
-  "DalamudApiLevel": 7,
+  "DalamudApiLevel": 8,
   "Punchline": "the old version of what is now Macro Chain"
 }
