@@ -3,11 +3,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Dalamud.Game;
 using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Hooking;
-using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 
 namespace OldMacroRecursion {
 
@@ -15,14 +14,16 @@ namespace OldMacroRecursion {
 
         class Svc
         {
-            [PluginService] static internal ChatGui Chat { get; private set; }
-            [PluginService] static internal CommandManager Commands { get; private set; }
-            [PluginService] static internal Framework Framework { get; private set; }
-            [PluginService] static internal SigScanner SigScanner { get; private set; }
+            [PluginService] static internal IChatGui Chat { get; private set; }
+            [PluginService] static internal ICommandManager Commands { get; private set; }
+            [PluginService] static internal IFramework Framework { get; private set; }
+            [PluginService] static internal ISigScanner SigScanner { get; private set; }
+            [PluginService] static internal IGameInteropProvider GameInteropProvider { get; private set; }
+            [PluginService] static internal IPluginLog PluginLog { get; private set; }
         }
 
         public string Name => "OldMacroRecursion";
-        private DalamudPluginInterface pluginInterface;
+        private readonly DalamudPluginInterface pluginInterface;
 
         public OldMacroRecursion(DalamudPluginInterface pluginInterface)
         {
@@ -31,11 +32,10 @@ namespace OldMacroRecursion {
 
             try
             {
-                var macroCallPtr = Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28");
-                macroCallHook = Hook<MacroCallDelegate>.FromAddress(macroCallPtr, new MacroCallDelegate(MacroCallDetour));
+                macroCallHook = Svc.GameInteropProvider.HookFromAddress<MacroCallDelegate>(Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28"), new MacroCallDelegate(MacroCallDetour));
                 macroCallHook?.Enable();
 
-                Svc.Commands.AddHandler("/runmacro", new Dalamud.Game.Command.CommandInfo(OnMacroCommandHandler)
+                Svc.Commands.AddHandler("/runmacro", new CommandInfo(OnMacroCommandHandler)
                 {
                     HelpMessage = "Execute a Macro - /runmacro ## [individual|shared] [line]",
                     ShowInHelp = true
@@ -43,7 +43,7 @@ namespace OldMacroRecursion {
             }
             catch (Exception ex)
             {
-                PluginLog.LogError(ex.ToString());
+                Svc.PluginLog.Error(ex.ToString());
             }
         }
 
@@ -92,9 +92,9 @@ namespace OldMacroRecursion {
                     scanBack -= 0x688;
                 }
 
-                PluginLog.LogError("Failed to find Macro[0]");
+                Svc.PluginLog.Error("Failed to find Macro[0]");
             } catch (Exception ex) {
-                PluginLog.LogError(ex.ToString());
+                Svc.PluginLog.Error(ex.ToString());
             }
         }
 
@@ -135,7 +135,7 @@ namespace OldMacroRecursion {
                     if (shared) num += 100;
                     
                     var macroPtr = macroDataPtr + 0x688 * num;
-                    PluginLog.Log($"Executing Macro #{num} @ {macroPtr}");
+                    Svc.PluginLog.Debug($"Executing Macro #{num} @ {macroPtr}");
                     MacroLock = false;
                     macroCallHook.Original(macroBasePtr, macroPtr);
 
@@ -146,7 +146,7 @@ namespace OldMacroRecursion {
                     Svc.Chat.PrintError("OldMacroRecursion is not ready.\nExecute a macro to finish setup.");
                 }
             } catch (Exception ex) {
-                PluginLog.LogError(ex.ToString());
+                Svc.PluginLog.Error(ex.ToString());
             }
         }
     }
