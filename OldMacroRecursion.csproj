@@ -25,13 +25,20 @@
 	
     </PropertyGroup>
 
+<Target Name="xivrepo" AfterTargets="PostBuildEvent">
 	<ItemGroup>
 		<FilesToMove Include="$(ProjectDir)$(OutDir)$(ProjectName)\*.*"/>
 	</ItemGroup>
+	<Move SourceFiles="@(FilesToMove)" DestinationFolder="$(ProjectDir)..\xivplugins\plugins\$(ProjectName)"/>
+    <ItemGroup>
+        <DeleteAssemblies Include="$(TargetDir)*.pdb" />
+        <DeleteAssemblies Include="$(TargetDir)$(AssemblyName).deps.json" />
+    </ItemGroup>
+    <Message Text="Deleting @(DeleteAssemblies)" Importance="high" />
+    <Delete Files="@(DeleteAssemblies)" />
+    <RemoveDir Directories="$(TargetDir)\ref\" />
+</Target>
 	
-	<Target Name="xivrepo" AfterTargets="PostBuildEvent">
-		<Move SourceFiles="@(FilesToMove)" DestinationFolder="$(ProjectDir)..\xivplugins\plugins\$(ProjectName)"/>
-	</Target>
 	<PropertyGroup>
 		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
 		<AssemblyName>OldMacroRecursion</AssemblyName>
