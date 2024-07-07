@@ -23,9 +23,9 @@ namespace OldMacroRecursion {
         }
 
         public string Name => "OldMacroRecursion";
-        private readonly DalamudPluginInterface pluginInterface;
+        private readonly IDalamudPluginInterface pluginInterface;
 
-        public OldMacroRecursion(DalamudPluginInterface pluginInterface)
+        public OldMacroRecursion(IDalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Svc>();
             this.pluginInterface = pluginInterface;

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<Platforms>x64</Platforms>
 		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -25,28 +25,23 @@
 	
     </PropertyGroup>
 
-<Target Name="xivrepo" AfterTargets="PostBuildEvent">
-	<ItemGroup>
-		<FilesToMove Include="$(ProjectDir)$(OutDir)$(ProjectName)\*.*"/>
-	</ItemGroup>
-	<Move SourceFiles="@(FilesToMove)" DestinationFolder="$(ProjectDir)..\xivplugins\plugins\$(ProjectName)"/>
-    <ItemGroup>
-        <DeleteAssemblies Include="$(TargetDir)*.pdb" />
-        <DeleteAssemblies Include="$(TargetDir)$(AssemblyName).deps.json" />
-    </ItemGroup>
-    <Message Text="Deleting @(DeleteAssemblies)" Importance="high" />
-    <Delete Files="@(DeleteAssemblies)" />
-    <RemoveDir Directories="$(TargetDir)\ref\" />
-</Target>
+	<Target Name="xivrepo" AfterTargets="Build" Condition="Exists($(RepoPath))">
+		<ItemGroup>
+			<FilesToMove Include="$(ProjectDir)$(OutDir)$(AssemblyName)\*.*" />
+		</ItemGroup>
+		<Move SourceFiles="@(FilesToMove)" DestinationFolder="$(ProjectDir)$(RepoPath)" OverwriteReadOnlyFiles="true" />
+		<Message Text="Moving to $(RepoPath)" Importance="high" />
+	</Target>
 	
 	<PropertyGroup>
 		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
 		<AssemblyName>OldMacroRecursion</AssemblyName>
 		<RootNamespace>OldMacroRecursion</RootNamespace>
+		<RepoPath>..\xivplugins\plugins\$(AssemblyName)</RepoPath>
 	</PropertyGroup>
 
 	<ItemGroup>
-      <PackageReference Include="DalamudPackager" Version="2.1.12" />
+      <PackageReference Include="DalamudPackager" Version="2.1.13" />
 	  <Reference Include="Dalamud">
 		<HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
 		<Private>false</Private>
